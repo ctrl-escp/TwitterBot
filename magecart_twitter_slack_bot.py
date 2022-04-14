@@ -1,5 +1,6 @@
 import json
 from tb import TwitterBot
+from datetime import datetime
 from slack_notifier import SlackNotifier
 
 keywords = ["magecart"]
@@ -17,6 +18,6 @@ if tbks:
 			published_counter += 1
 
 if published_counter:
-	print(f"Published {published_counter} tweets")
+	print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Published {published_counter} tweets")
 else:
-	print("Nothing new...")
+	print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Nothing new...")
