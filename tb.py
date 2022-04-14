@@ -35,7 +35,7 @@ class TwitterBot:
 
 	def _get_creds(self):
 		with open(self.creds_filename, encoding="utf-8") as f:
-			bearer_token = f"Bearer {f.read()}"
+			bearer_token = f"Bearer {f.read().strip()}"
 		return bearer_token
 
 	def get_tweets_by_keyword(self, keyword, max_results):
