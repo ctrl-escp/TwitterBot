@@ -1,5 +1,6 @@
 import json
 from tb import TwitterBot
+from time import sleep
 from slack_notifier import SlackNotifier
 
 keywords = ["magecart"]
@@ -15,6 +16,7 @@ if tbks:
 		for tweet in tbks[kw]:
 			sn.post_message(tweet['url'])
 			published_counter += 1
+			sleep(5)
 
 if published_counter:
 	print(f"Published {published_counter} tweets")
