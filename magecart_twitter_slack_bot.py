@@ -5,7 +5,7 @@ from slack_notifier import SlackNotifier
 keywords = ["magecart"]
 
 tb = TwitterBot()
-tbks = tb.get_latest_tweets_by_keywords(keywords, 50)
+tbks = tb.get_latest_tweets_by_keywords(keywords, 30)
 published_counter = 0
 if tbks:
 	with open(".config.json", encoding="utf-8") as f:
