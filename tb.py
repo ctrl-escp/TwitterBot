@@ -5,7 +5,6 @@ Retrieve recent tweets by keywords.
 import re
 import requests
 from db import DatabaseSqlite3
-from argparse import ArgumentParser
 
 
 class TwitterBot:
@@ -97,19 +96,16 @@ class TwitterBot:
 		return tbk
 
 
-def get_parser():
+if __name__ == '__main__':
+	import json
+	from argparse import ArgumentParser
 	parser = ArgumentParser(description="Twitter Bot")
 	parser.add_argument("keywords", metavar="KEYWORD", action="extend", nargs="+", type=str,
 						help="Keyword(s) to retrieve results for")
-	parser.add_argument("-l", "--limit", action="store", type=int, default=50,
+	parser.add_argument("-l", "--limit", action="store", type=int, default=10,
 						help="Max number of tweets to retrieve per keyword")
+	args = parser.parse_args()
 
-	return parser
-
-
-if __name__ == '__main__':
-	import json
-	args = get_parser().parse_args()
 	tb = TwitterBot()
 	tbks = tb.get_latest_tweets_by_keywords(args.keywords, args.limit)
 	print(json.dumps(tbks, indent=2))

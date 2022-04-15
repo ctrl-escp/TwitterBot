@@ -1,6 +1,5 @@
-# TwitterBot (WiP)
+# TwitterBot
 Fetch the latest tweets from Twitter by keyword.
-Contains a slack notifier module to send tweets to a private channel.
 
 ## Installation
 Requires Python 3.10 and above
@@ -8,7 +7,8 @@ Requires Python 3.10 and above
 
 ## Usage
 ### Command-Line Usage
->python3 tb.py keyword -l 50
+>python3 tb.py keyword -l 20
+
 You can always run `python3 tb.py -h`
 ```
 usage: tb.py [-h] [-l LIMIT] KEYWORD [KEYWORD ...]
@@ -25,12 +25,8 @@ options:
 ```
 
 ### Programmatically
-Just like the code in [magecart_twitter_slack_bot.py](magecart_twitter_slack_bot.py):
-
-Get the tweets:
 ```python
 from tb import TwitterBot
-keywords = ["python"]
 tb = TwitterBot()
-tbks = tb.get_latest_tweets_by_keywords(keywords, 50)
+tbks = tb.get_latest_tweets_by_keywords(["keyword"], 20)
 ```
