@@ -4,7 +4,11 @@ Retrieve recent tweets by keywords.
 """
 import re
 import requests
-from sqliter3.sqliter3 import Sqliter3
+try:
+	from sqliter3.sqliter3 import Sqliter3
+except ModuleNotFoundError:
+	# noinspection PyUnresolvedReferences,PyPackageRequirements
+	from TwitterBot.sqliter3.sqliter3 import Sqliter3
 
 
 class TwitterBot:
