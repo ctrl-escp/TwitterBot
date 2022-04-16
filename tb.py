@@ -4,7 +4,7 @@ Retrieve recent tweets by keywords.
 """
 import re
 import requests
-from .db import DatabaseSqlite3
+from sqliter3.sqliter3 import Sqliter3
 
 
 class TwitterBot:
@@ -26,7 +26,7 @@ class TwitterBot:
 		:param str db_filename: (optional) The name of the database file to save tweets to.
 		"""
 		self.bearer_token = f"Bearer {token}"
-		self.db = DatabaseSqlite3(db_filename or self.default_db_filename)
+		self.db = Sqliter3(db_filename or self.default_db_filename)
 		table_created = self.db.run_query(self._tb_schema)
 		if not table_created["success"]:
 			raise Exception(table_created["error"])

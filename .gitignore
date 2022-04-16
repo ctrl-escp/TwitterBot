@@ -1,6 +1,6 @@
 .idea/
 __pycache__
-.creds
-.config.json
 *tmp*.*
 *.db
+*.sqlite
+*.sqlite3

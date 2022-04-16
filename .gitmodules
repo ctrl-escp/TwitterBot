@@ -1,0 +1,3 @@
+[submodule "sqliter3"]
+	path = sqliter3
+	url = git@github.com:ctrl-escp/sqliter3.git
