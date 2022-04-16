@@ -22,7 +22,11 @@ class TwitterBot:
 	"text"			TEXT NOT NULL,
 	"parsed_text"	TEXT
 	);"""
-	url_regex = re.compile(r"\bhttps?://t\.co/\S+")
+	url_regex = re.compile(r"https?://t\.co/\S+")
+	hashes_regex = re.compile(r"#\w+")
+	mentions_regex = re.compile(r"@\w+")
+	spaces_regex = re.compile(r"\s|\n|\r|\t")
+	unicode_regex = re.compile(r"\\u\d+\b")
 
 	def __init__(self, token, db_filename=None):
 		"""
@@ -37,7 +41,6 @@ class TwitterBot:
 
 	def get_tweets_for_phrase(self, search_phrase, max_results):
 		"""
-
 		:param str search_phrase: The phrase to search for.
 		:param int max_results: The maximum number of retrieved results. Must be between 10 and 100.
 		:return dict: Success=True and results if successful; success=False and error message otherwise.
@@ -63,10 +66,16 @@ class TwitterBot:
 		"""
 		Remove Twitter shortened URLs as many links to the same source are given different addresses, making the
 		Tweet appear different even though the content is the same.
+		Remove other differences which may influence comparison without actually containing different content.
 		:param str text: The tweet to parse.
 		:return str: The parsed tweet.
 		"""
-		return self.url_regex.sub("", text).strip()
+		t = self.url_regex.sub("", text).strip()
+		t = self.hashes_regex.sub("", t).strip()
+		t = self.mentions_regex.sub("", t).strip()
+		t = self.unicode_regex.sub("", t).strip()
+		t = self.spaces_regex.sub("", t).strip()
+		return t
 
 	def _exists_in_db_in_either_text_or_id(self, tweet_details):
 		"""
