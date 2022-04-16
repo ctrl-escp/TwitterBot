@@ -4,7 +4,7 @@ Retrieve recent tweets by keywords.
 """
 import re
 import requests
-from db import DatabaseSqlite3
+from .db import DatabaseSqlite3
 
 
 class TwitterBot:
