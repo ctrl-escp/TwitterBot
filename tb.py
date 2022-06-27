@@ -4,13 +4,16 @@ Retrieve recent tweets by keywords.
 """
 import re
 import requests
+
 try:
+	# noinspection PyUnresolvedReferences
 	from sqliter3.sqliter3 import Sqliter3
 except ModuleNotFoundError:
 	# noinspection PyUnresolvedReferences,PyPackageRequirements
-	from TwitterBot.sqliter3.sqliter3 import Sqliter3
+	from .sqliter3.sqliter3 import Sqliter3
 
 
+# noinspection SqlResolve
 class TwitterBot:
 	search_url = "https://api.twitter.com/2/tweets/search/recent"
 	default_db_filename = "tb.db"
@@ -39,10 +42,11 @@ class TwitterBot:
 		if not table_created["success"]:
 			raise Exception(table_created["error"])
 
-	def get_tweets_for_phrase(self, search_phrase, max_results):
+	def get_tweets_for_phrase(self, search_phrase, max_results, include_retweets=False):
 		"""
 		:param str search_phrase: The phrase to search for.
 		:param int max_results: The maximum number of retrieved results. Must be between 10 and 100.
+		:param bool include_retweets: (optional) defaults to False.
 		:return dict: Success=True and results if successful; success=False and error message otherwise.
 		"""
 		result = {"success": False}
@@ -50,7 +54,10 @@ class TwitterBot:
 			result["error"] = f"The results limit must be between 10 and 100. Got {max_results}"
 		else:
 			try:
-				params = {"query": f"{search_phrase} -is:retweet", "max_results": max_results}		# Skip retweets.
+				params = {
+					"query": f"{search_phrase}{' -is:retweet' if include_retweets else ''}",
+					"max_results": max_results
+				}
 				headers = {"Authorization": self.bearer_token}
 				resp = requests.get(self.search_url, headers=headers, params=params)
 				if resp.status_code == 200:
@@ -104,7 +111,7 @@ class TwitterBot:
 			return self._save_to_db(t)
 		return False
 
-	def get_latest_tweets_by_keywords(self, keywords, max_results):
+	def get_latest_tweets_by_keywords(self, keywords, max_results, parsed_results=True):
 		tbk = {}
 		for keyword in keywords:
 			res = self.get_tweets_for_phrase(keyword, max_results)
@@ -113,7 +120,11 @@ class TwitterBot:
 			new_tweets = []
 			for tweet in res["results"]["data"]:
 				if self._is_a_new_tweet(tweet):
-					new_tweets.append({"text": tweet["text"], "url": f"{self.url_to_tweet}/{tweet['id']}"})
+					if parsed_results:
+						new_tweets.append({"text": tweet["text"], "url": f"{self.url_to_tweet}/{tweet['id']}"})
+					else:
+						tweet.update({"url": f"{self.url_to_tweet}/{tweet['id']}"})
+						new_tweets.append(tweet)
 			if new_tweets:
 				tbk[keyword] = new_tweets
 		return tbk
@@ -122,14 +133,17 @@ class TwitterBot:
 if __name__ == '__main__':
 	import json
 	from argparse import ArgumentParser
+
 	parser = ArgumentParser(description="Twitter Bot")
 	parser.add_argument("token", action="store", type=str, help="Bearer token for Twitter.")
 	parser.add_argument("keywords", metavar="KEYWORD", action="extend", nargs="+", type=str,
-						help="Keyword(s) to retrieve results for")
+						help="Keyword(s) to retrieve results for.")
 	parser.add_argument("-l", "--limit", action="store", type=int, default=10,
-						help="Max number of tweets to retrieve per keyword")
+						help="Max number of tweets to retrieve per keyword.")
+	parser.add_argument("--disable-parsing", dest="parsing", action="store_false", help="Return the complete tweet object.")
+
 	args = parser.parse_args()
 
 	tb = TwitterBot(args.token)
-	tbks = tb.get_latest_tweets_by_keywords(args.keywords, args.limit)
+	tbks = tb.get_latest_tweets_by_keywords(args.keywords, args.limit, args.parsing)
 	print(json.dumps(tbks, indent=2))
